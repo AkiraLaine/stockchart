@@ -4,6 +4,7 @@ var express = require('express');
 var mongoose = require('mongoose');
 var session = require('express-session');
 var route = require("./app/routes.js");
+var stocks = ["FB", "AMZN"];
 var app = express();
 require('dotenv').load();
 
@@ -22,6 +23,16 @@ route(app);
 
 var port = process.env.PORT || 8080;
 
-app.listen(port,  function () {
+var server = app.listen(port,  function () {
 	console.log('Node.js listening on port ' + port + '...');
+});
+
+var io = require('socket.io')(server);
+
+io.on('connection', function(socket){
+  console.log('a user connected');
+  socket.on("add stock", function(stock) {
+  	console.log("Added stock: " + stock);
+  	io.emit("stock added", stock);
+  });
 });

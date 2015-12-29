@@ -6,11 +6,22 @@
 	
 <body>
 	<h1>Stockchart</h1>
-	<canvas id="myChart" width="900" height="400"></canvas>
+	<h3>Loading...</h3>
+	<canvas id="myChart"></canvas>
+	<input type="text" id="addStock"/>
+	<button type="submit">Submit</button>
 	
 	<link href="/public/css/main.css" rel="stylesheet" type="text/css">
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js"></script>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
 	<script type="text/javascript" src="/controllers/app.js"></script>
+	<script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
+	<script type="text/javascript">
+		var socket = io();
+		socket.emit('add stock', "Apple");
+		socket.on("stock added", function(stock) {
+			console.log("The " + stock + " stock has been added!");
+		});
+	</script>
 </body>
 </html>
