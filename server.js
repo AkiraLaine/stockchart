@@ -24,17 +24,19 @@ io.on('connection', function(socket){
     socket.emit("stock list", stocks);
     
     socket.on("add stock", function(stock) {
-        stock = stock.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;').replace(/&/g, "").replace(/\?/g, "");
-        request("https://www.quandl.com/api/v3/datasets/WIKI/" + stock + ".json?api_key=-mh6aB7AKrqyYRi5ztzQ", function (error, response, body) {
-            if (!error && response.statusCode == 200) {
-                stocks.push(stock);
-    	        io.emit("stock added", stock);
-            }
-        })
+        stock = stock.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;').replace(/&/g, "").replace(/\?/g, "").toUpperCase();
+        if (stocks.indexOf(stock) === -1) {
+            request("https://www.quandl.com/api/v3/datasets/WIKI/" + stock + ".json?api_key=-mh6aB7AKrqyYRi5ztzQ", function (error, response, body) {
+                if (!error && response.statusCode == 200) {
+                    stocks.push(stock);
+        	        io.emit("stock added", stock);
+                }
+            })
+        }
     });
     
     socket.on("remove stock", function(stock) {
-            stock = stock.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;').replace(/&/g, "").replace(/\?/g, "");
+            stock = stock.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;').replace(/&/g, "").replace(/\?/g, "").toUpperCase();
             if (stocks.indexOf(stock) > -1) {
                 stocks.remove(stock);
                 io.emit("stock removed", stock);
