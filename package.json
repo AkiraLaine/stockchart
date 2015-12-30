@@ -10,8 +10,6 @@
   "homepage": "http://www.clementinejs.com/",
   "bugs": "https://github.com/johnstonbl01/clementinejs-fcc/issues",
   "keywords": [
-    "MongoDB",
-    "Mongoose",
     "full stack",
     "Express",
     "Node",
@@ -24,11 +22,8 @@
   "author": "Blake Johnston",
   "license": "MIT",
   "dependencies": {
-    "dotenv": "^1.2.0",
     "express": "^4.12.4",
     "express-session": "^1.11.3",
-    "mongoose": "^4.1.0",
-    "passport": "^0.3.0",
-    "passport-github": "^1.0.0"
+    "socket.io": "^1.3.7"
   }
 }
