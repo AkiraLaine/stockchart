@@ -30,22 +30,16 @@ var server = app.listen(port,  function () {
 var io = require('socket.io')(server);
 
 io.on('connection', function(socket){
-  console.log('a user connected');
   socket.emit("stock list", stocks);
   
   socket.on("add stock", function(stock) {
-  	console.log("Added stock: " + stock);
   	stocks.push(stock);
   	io.emit("stock added", stock);
   });
   
   socket.on("remove stock", function(stock) {
-  	console.log(stock + " got wants to be removed");
-  	if (stocks.indexOf(stock) !== -1) {
-  		console.log(stock + " is in ze stocks");
+  	if (stocks.indexOf(stock) > -1) {
   		stocks.remove(stock);
-  		console.log(stock + " got sliced");
-  		console.log(stocks);
   		io.emit("stock removed", stock);
   	}
   });

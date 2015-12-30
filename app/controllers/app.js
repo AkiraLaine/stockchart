@@ -13,21 +13,32 @@ var colors = {
 }
 var socket = io();
 var stocks = [];
+
+function redrawChart() {
+    if (myLineChart) {
+        myLineChart.destroy();
+    }
+    myLineChart = new Chart(ctx).Line({
+        labels: labels,
+        datasets: datasets
+    });
+}
+
 socket.on("stock added", function(stock) {
     stocks.push(stock);
-    $("#stock_disp").append("<div><p>" + stock + "</p><button class='delete'>x</button></div>");
-    $(".delete").on("click", function(){
+    $("#stock_disp").append("<div class='delete-container'><div class='stock-color' data-stock='" + stock + "'></div><p class='delete-stock-text'>" + stock + "</p><button class='btn btn-warning btn-delete'>x</button></div>");
+    $(".btn-delete").on("click", function(){
         var stockArr = $(this).parent().text().split("");
         stockArr.pop()
         var stock = stockArr.join("");
+        stock = stock.replace(/[ ]/g, "");
+        console.log("new" + stock);
         socket.emit("remove stock", stock);
         $(this).parent().remove();
     })
-    chartStock(stock, function() {
-        myLineChart = new Chart(ctx).Line({
-            labels: labels,
-            datasets: datasets
-        });
+    chartStock(stock, function(stock) {
+        $('*[data-stock="' + stock + '"]').attr("style", "background-color: " + getColorFromStock(stock));
+        redrawChart();
     });
 });
 
@@ -36,14 +47,13 @@ socket.on("stock removed", function(stock) {
     datasets = datasets.filter(function(dataset) {
         return stock !== dataset.label
     });
-    myLineChart = new Chart(ctx).Line({
-        labels: labels,
-        datasets: datasets
-    });
+    $('*[data-stock="' + stock + '"]').parent().remove();
+    redrawChart();
 });
 
 $("#submit").on("click", function() {
     var stock = $("#addStock").val();
+    console.log("val" + stock)
     socket.emit("add stock", stock);
     $("#addStock").val("");
 });
@@ -104,41 +114,50 @@ function chartStock(stock, cb) {
                 });
             }
             if (typeof cb === "function") {
-                cb();
+                cb(stock);
             }
         }
     });
 }
 
+function getColorFromStock(stock) {
+    var color = undefined;
+    datasets.forEach(function(dataset) {
+        if (dataset.label === stock) {
+            color = dataset.strokeColor;
+        }
+    });
+    return color;
+}
+
 function callChartLoop() {
     $("#stock_disp").empty();
+    var done = 0;
     for (var i = 0; i < stocks.length; i++) {
         console.log(i);
-        if (i === stocks.length -1 ) {
-            $("h3").html("<h3>Loading " + stocks[i] + "</h3>")
-            $("#stock_disp").append("<div><p>" + stocks[i] + "</p><button class='delete'>x</button></div>");
-            $(".delete").on("click", function(){
+        $("#stock_disp").append("<div class='delete-container'><div class='stock-color' data-stock='" + stocks[i] + "'> </div><p class='delete-stock-text'>" + stocks[i] + "</p><button class='btn btn-warning btn-delete'>x</button></div>");
+        console.log("Checking: " + stocks[i]);
+        chartStock(stocks[i], function(stock) {
+            console.log(stock, 654);
+            $('*[data-stock="' + stock + '"]').attr("style", "background-color: " + getColorFromStock(stock));
+            done++;
+        });
+    }
+    var interval = setInterval(function() {
+        if (done === stocks.length) {
+            $(".btn-delete").on("click", function(){
                 var stockArr = $(this).parent().text().split("");
                 stockArr.pop()
                 var stock = stockArr.join("");
+                stock = stock.replace(/[ ]/g, "");
                 socket.emit("remove stock", stock);
                 $(this).parent().remove();
             })
-            chartStock(stocks[i], function() {
-                $("h3").hide();
-                myLineChart = new Chart(ctx).Line({
-                    labels: labels,
-                    datasets: datasets
-                });
-            });
+            $("h3").hide();
+            redrawChart();
+            clearInterval(interval);
         }
-        else {
-            $("h3").html("<h3>Loading " + stocks[i] + "</h3>")
-            $("#stock_disp").append("<div><p>" + stocks[i] + "</p><button class='delete'>x</button></div>");
-            console.log("Checking: " + stocks[i]);
-            chartStock(stocks[i]);
-        }
-    }
+    }, 1000);
 }
 
 callChartLoop()

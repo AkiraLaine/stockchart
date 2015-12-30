@@ -6,17 +6,16 @@
 	
 <body>
 	<h1>Stockchart</h1>
-	<h3>Loading...</h3>
 	<canvas id="myChart"></canvas>
 	<div id="stock_disp"></div>
-	<input type="text" id="addStock"/>
-	<button type="submit" id="submit">Submit</button>
-	
-	
+	<input type="text" id="addStock" class="form-control" placeholder="Enter Stock Symbol"/>
+	<button type="submit" id="submit" class="btn btn-primary">Submit</button>
+
 	<link href="/public/css/main.css" rel="stylesheet" type="text/css">
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js"></script>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
 	<script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 	<script type="text/javascript" src="/controllers/app.js"></script>
 	<script>
 		Array.prototype.remove = function() {
