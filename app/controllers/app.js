@@ -58,6 +58,16 @@ $("#submit").on("click", function() {
     $("#addStock").val("");
 });
 
+$("#addStock").on("keypress", function(e) {
+    if (e.which === 13) {
+        e.preventDefault();
+        var stock = $("#addStock").val();
+        console.log("val" + stock)
+        socket.emit("add stock", stock);
+        $("#addStock").val("");
+    }
+});
+
 socket.on("stock list", function(stock_array) {
     stocks = stock_array;
     callChartLoop();
