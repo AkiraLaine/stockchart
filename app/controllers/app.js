@@ -74,6 +74,7 @@ function chartStock(stock, cb) {
         contentType: "application/json",
         dataType: "json",
         success: function(data) {
+            console.log(data);
             var dataArr = data.dataset.data.splice(0, 50);
             ydata[stock] = [];
             for (var i in dataArr) {

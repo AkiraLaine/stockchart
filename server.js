@@ -5,6 +5,7 @@ var session = require('express-session');
 var route = require("./app/routes.js");
 var stocks = ["FB", "AMZN"];
 var app = express();
+var request = require('request');
 
 app.use('/controllers', express.static(process.cwd() + '/app/controllers'));
 app.use('/public', express.static(process.cwd() + '/public'));
@@ -20,19 +21,25 @@ var server = app.listen(port,  function () {
 var io = require('socket.io')(server);
 
 io.on('connection', function(socket){
-  socket.emit("stock list", stocks);
-  
-  socket.on("add stock", function(stock) {
-  	stocks.push(stock);
-  	io.emit("stock added", stock);
-  });
-  
-  socket.on("remove stock", function(stock) {
-  	if (stocks.indexOf(stock) > -1) {
-  		stocks.remove(stock);
-  		io.emit("stock removed", stock);
-  	}
-  });
+    socket.emit("stock list", stocks);
+    
+    socket.on("add stock", function(stock) {
+        stock = stock.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+        request("https://www.quandl.com/api/v3/datasets/WIKI/" + stock + ".json?api_key=-mh6aB7AKrqyYRi5ztzQ", function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+                stocks.push(stock);
+    	        io.emit("stock added", stock);
+            }
+        })
+    });
+    
+    socket.on("remove stock", function(stock) {
+            stock = stock.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+            if (stocks.indexOf(stock) > -1) {
+                stocks.remove(stock);
+                io.emit("stock removed", stock);
+            }
+    });
 });
 
 Array.prototype.remove = function() {
